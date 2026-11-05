@@ -10,6 +10,15 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
 ## 可以做什么
 ## Features
 
+- 默认使用中文；右上角语言选择器至少高 44 px，可切换中英 / 中文 / English，并在刷新后恢复选择。
+  Chinese is the default. The language picker is at least 44 px high, supports bilingual / Chinese / English, and restores the saved choice after reload.
+- 按选定频段适配一次时频图色阶，或手动设置颜色对应的 dBFS 上下限、恢复默认。频率轴保持 20 Hz–20 kHz；更换色阶会清空旧颜色历史。拟合期间改变频段会重新开始，固定后的色阶不会连续追随声音。
+  Fit the spectrogram color range once to the selected band, set manual dBFS color limits, or reset them. Frequency axes remain 20 Hz–20 kHz; changing the color range clears old color history. Changing bands during a fit restarts it, and a locked scale does not continuously follow the sound.
+- 捕捉高频窄峰时保留显示像素内最强 FFT 格点。颜色只能增强已录入信号的显示，不能恢复未录入的声音；麦克风、设备处理或信号太弱都可能影响捕捉，可用其他设备或设置对照。
+  Display pixels retain the strongest FFT bin so narrow high-frequency peaks remain visible. Color contrast cannot recover uncaptured signals: microphone response, device processing, or a weak signal can affect capture. Compare another device or recording setting.
+- 默认标签使用每次开始录制的本地时间戳；手动输入的标签会保留。采集和对照区域的频率上下限双向同步。色阶不改变原始 PCM、分析算法、共同阈值或比较结果。
+  Default labels use each recording's local start timestamp; manual labels are preserved. Capture and comparison frequency limits synchronize in both directions. Color controls do not change raw PCM, analysis algorithms, the shared threshold, or comparison results.
+
 - 网页界面提供中英 / 中文 / English 三种阅读模式。  
   The web interface offers three reading modes: bilingual Chinese/English, Chinese, and English.
 - 展开“使用方法”可查看图文说明，包括明确标注为虚构的五楼示例和实际界面截图。  
@@ -112,7 +121,7 @@ Export backups regularly. Backups contain audio and labels, so review them befor
 ## Tests
 
 ```sh
-node test.mjs
+npm test
 ```
 
 覆盖已知正弦波 RMS、带外抑制、阶跃幅度、零信号、短片段、窄带无格点、削波候选、中文自然排序、事件/安静空集合、分组时长守恒、Worklet 精确停止及提前停止。浏览器中还有“内置计算自检”。  

@@ -8,6 +8,11 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
 
 ## Features
 
+- Chinese is the default. The language picker is at least 44 px high, supports bilingual / Chinese / English, and restores the saved choice after reload.
+- Fit the spectrogram color range once to the selected band, set manual dBFS color limits, or reset them. Frequency axes remain 20 Hz–20 kHz; changing the color range clears old color history. Changing bands during a fit restarts it, and a locked scale does not continuously follow the sound.
+- Display pixels retain the strongest FFT bin so narrow high-frequency peaks remain visible. Color contrast cannot recover uncaptured signals: microphone response, device processing, or a weak signal can affect capture. Compare another device or recording setting.
+- Default labels use each recording's local start timestamp; manual labels are preserved. Capture and comparison frequency limits synchronize in both directions. Color controls do not change raw PCM, analysis algorithms, the shared threshold, or comparison results.
+
 - The web interface offers three reading modes: bilingual Chinese/English, Chinese, and English.
 - Expand “How to use” for illustrated instructions, including an explicitly fictional fifth-floor example and actual UI screenshots.
 - Built-in simulated capture requires no microphone. It sends synthetic audio through the real AudioWorklet and IndexedDB pipeline and labels it as simulated data.
@@ -71,7 +76,7 @@ Export backups regularly. Backups contain audio and labels, so review them befor
 ## Tests
 
 ```sh
-node test.mjs
+npm test
 ```
 
 Tests cover known sine-wave RMS, out-of-band rejection, amplitude steps, silence, short segments, narrow bands containing no bins, clipping candidates, Chinese natural sorting, empty event/quiet groups, conservation of grouped duration, and exact and early Worklet stopping. The browser also includes a built-in calculation self-check.

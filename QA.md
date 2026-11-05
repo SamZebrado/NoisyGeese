@@ -1,3 +1,48 @@
+# NoisyGeese v1.1 · Candidate verification
+
+Verified on 2026-11-05 UTC in a fresh checkout of `codex/color-scale-20261105`, starting from `a792dfcbccc1df09ff6deb93a5739aad3c1d4866`. Real Chrome 157.0.8103.38 on macOS was driven with Playwright in isolated browser contexts. The real microphone API was blocked by the QA harness: zero calls occurred. Only built-in demo/simulated audio and explicitly injected synthetic FFT bins were used; no existing browser profile or recordings were read.
+
+## Fixes verified
+
+- Color status now updates both localization sources with each runtime message. Switching Chinese, English, or bilingual mode preserves the current reset, manual, invalid-range, fitted-band, and no-signal status.
+- A band change during an active fit restarts sampling for the new band, including a manually requested fit with automatic fitting disabled. Reset cancels a pending fit.
+- On narrow screens, the comparison-band label occupies its own line so both numeric frequency limits remain together.
+
+## Automated results
+
+- `npm test`: all baseline DSP/natural-sort/capture tests and all display-helper tests passed. Known sine RMS: −23.010299939 dBFS; distant-band rejection: −127.165528 dB; stepped-signal ordering and expected power increase passed.
+- `node --check` passed for all 12 JavaScript modules across `dist/` and `docs/`, plus both root test modules.
+- Baseline silence, short input, no FFT bins, clipping candidates, empty event/quiet classes, representative-duration totals, exact sample-count stopping, and early stop/flush tests passed.
+- Selected-band fitting, narrow-peak preservation, level clamping, no-signal handling, FFT immutability, and comparison invariance helper tests passed.
+
+## Browser results
+
+All 30 desktop/responsive checks passed, followed by focused touch-viewport checks at 375 and 390 px:
+
+- Default Chinese; language picker measured 102 × 44 px on desktop and at least 44 px high in every layout. All three modes switch and restore after reload.
+- Manual color limits, invalid limits, reset, pending-fit cancellation, automatic fit restarts, and manual-fit range changes passed. Color-only fitting/manual/reset operations preserved rendered comparison output and the shared threshold.
+- A synthetic −72 dBFS narrow peak near 10.55 kHz, with a louder −20 dBFS out-of-band low tone, fitted the 10–11 kHz band to −125…−65 dBFS. The high-frequency waterfall pixel was visibly bright (RGBA 218, 209, 139, 255). Out-of-band peaks can saturate as intended.
+- Negative-infinity silence and a 101–102 Hz band with no FFT bins reported no valid signal and retained the previous valid color limits.
+- Spectrum and waterfall frequency axes stayed at 20 Hz–20 kHz throughout; only heatmap color levels adapted.
+- Capture/comparison numeric controls, presets, and spectrum keyboard controls synchronized both ways and invalidated stale comparison output.
+- A default label matched the local second-resolution timestamp of the saved recording's start, after waiting before recording. A 5-second simulated capture contained exactly 220,500 samples at 44,100 Hz, marked synthetic. A manually entered Chinese label survived recording and language changes.
+- Desktop 1440 px and narrow 375/390 px layouts were captured in Chinese, English, and bilingual modes: document scroll width equaled client width in all nine cases. Touch-viewport taps exercised fit/reset, preset and two-way numeric sync. Both comparison frequency limits shared the same row in all six mobile language layouts, with actual synthetic comparison graphs shown.
+- No uncaught page errors occurred. Browser contexts and Chrome were closed after each run. No Playwright MCP session was started; the sandbox denied the optional process-inventory command, so unrelated processes were not inspected or changed.
+
+The downloadable QA evidence bundle contains desktop/mobile PNG screenshots, machine-readable results, and the browser harnesses. Test recording payloads are excluded from repository source archives and evidence.
+
+## Scope and limits
+
+The capture worklet, DSP, analysis worker, thresholds, and comparison algorithms remain unchanged from the v1.0 baseline. Display contrast cannot recover uncaptured signals; the visible note mentions microphone/device processing and weak signals, and suggests device/setting comparison. No main-branch merge, publishing, settings changes, record deletion, or permission grants were performed.
+
+Mobile checks emulate viewport, touch, and pixel density in desktop Chrome; they do not establish physical-device microphone response, mobile background behavior, or calibrated sound-pressure accuracy. Real-microphone checks were deliberately excluded.
+
+## Source packaging
+
+`dist/` and `docs/` are byte-identical. Both `source.zip` copies contain the root README variants, LICENSE, QA.md, package.json, both test modules, and all `dist/` static assets (including logo and guide images) except `source.zip`. No nested archives or test recordings are included. The extracted package passes `npm test` and JavaScript syntax checks.
+
+---
+
 # NoisyGeese v1.0 · Verification
 
 Tested on 2026-11-05 using a cloud Chrome browser and Node.js. All audio used in testing was synthetic. No real microphone, household audio, address, or actual floor was used or included in the repository.
