@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import {bandValues,fitColorRange,displayLevel,pixelPeak} from './dist/display-scale.js';
+import {analyze} from './dist/dsp.js';
+import {readFileSync} from 'node:fs';
+const data=new Float32Array(4096).fill(-120);data[1801]=-72;data[30]=-20;
+const before=data.slice();const hz=1801*48000/8192;
+const selected=bandValues(data,48000,8192,10000,11000);
+assert.equal(Math.max(...selected),-72,'Out-of-band loud low tone must not set high-band scale');
+assert.deepEqual(fitColorRange(selected),{min:-125,max:-65});
+assert(displayLevel(-72,-125,-65)>.8);assert(displayLevel(-72,-100,-25)<.4);
+assert.equal(pixelPeak(data,48000,8192,hz-20,hz+20),-72,'A narrow peak between display samples is preserved');
+assert.equal(pixelPeak(data,48000,8192,25000,26000),-Infinity);
+assert.equal(displayLevel(-Infinity,-100,-25),0);
+assert.equal(displayLevel(NaN,-100,-25),0);
+assert.equal(displayLevel(2,-100,-25),1);
+assert.equal(displayLevel(-200,-100,-25),0);
+assert.equal(fitColorRange([-Infinity,NaN]),null);
+for(const values of [[-150],[-20],[-120,-120,-120],[0],[-90,-80,-70]]){const r=fitColorRange(values);assert(r.max>r.min);assert(r.min>=-160&&r.max<=0);assert(r.max-r.min>=20);}
+assert.deepEqual(data,before,'Display helpers must leave FFT data untouched');
+const pcm=new Float32Array(48000);for(let i=0;i<pcm.length;i++)pcm[i]=.01*Math.sin(2*Math.PI*10000*i/48000);const stats=analyze(pcm,48000,9000,11000,1);fitColorRange(selected);assert.deepEqual(analyze(pcm,48000,9000,11000,1),stats,'Color changes cannot change comparisons');
+const app=readFileSync('dist/app.js','utf8'),html=readFileSync('dist/index.html','utf8'),i18n=readFileSync('dist/i18n.js','utf8');
+assert(app.includes("[['lowHz','highHz'],['compareLowHz','compareHighHz']]"));
+assert(app.includes("$('compareLowHz').value=low;$('compareHighHz').value=high"));
+assert(app.includes("automaticLabel||!$('recordLabel').value.trim()?timestampLabel()"));
+assert(i18n.includes("let mode='zh'"));assert(i18n.includes("localStorage.getItem('noisygeese-language')"));assert(i18n.includes("localStorage.setItem('noisygeese-language',mode)"));
+for(const id of ['colorMin','colorMax','autoColor','fitColor','resetColor','compareLowHz','compareHighHz'])assert(html.includes('id="'+id+'"'));
+assert(html.includes('cannot recover a signal that was not captured'));
+console.log('PASS: selected-band color fitting, high-frequency pixel peaks, empty signal, clamping, immutability, comparison invariance, range sync, timestamp, language persistence, and capture-limit copy.');

@@ -5,6 +5,10 @@
 const dictionary = new Map(Object.entries({
 '暴噪鹅 · LOCAL SOUND LAB':'暴噪鹅 · LOCAL SOUND LAB',
 '音频只在本机处理':'Audio stays on this device',
+'色阶下限 dBFS':'Color minimum, dBFS',
+'色阶上限 dBFS':'Color maximum, dBFS',
+'对照频段下限 Hz':'Comparison lower band edge, Hz',
+'对照频段上限 Hz':'Comparison upper band edge, Hz',
 '测量说明 ↗':'Measurement notes ↗',
 '听见声音，也看见差异':'Hear the sound. See the difference.',
 '把一段声音，':'Take a sound.',
@@ -168,7 +172,7 @@ function english(s){
  for(const [re,fn] of rules){const match=s.match(re);if(match)return fn(match);}
  return s;
 }
-let mode='bi';
+let mode='zh';try{const saved=localStorage.getItem('noisygeese-language');if(['bi','zh','en'].includes(saved))mode=saved;}catch{}
 const originals=new WeakMap(),attributeOriginals=new WeakMap();
 const ignored='script,style,textarea,#languageMode,option[data-no-i18n],[data-no-i18n],.record-title>span:first-child,.bar-label,.timeline-row>.timeline-meta:first-child';
 function translated(source,en){
@@ -210,7 +214,7 @@ const observer=new MutationObserver(records=>{
 const observerOptions={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','aria-label','placeholder','alt','data-zh','data-en']};
 function flush(){scheduled=false;observer.disconnect();for(const node of pending)if(node.isConnected)visit(node);pending.clear();observer.observe(document.body,observerOptions);}
 function refresh(){observer.disconnect();pending.clear();visit(document.body);document.documentElement.lang=mode==='en'?'en':mode==='zh'?'zh-CN':'zh-CN';document.documentElement.dataset.language=mode;observer.observe(document.body,observerOptions);}
-function setMode(next){if(!['bi','zh','en'].includes(next))return;mode=next;const picker=document.getElementById('languageMode');if(picker)picker.value=mode;refresh();window.dispatchEvent(new CustomEvent('ng-language-change',{detail:{mode}}));}
+function setMode(next){if(!['bi','zh','en'].includes(next))return;mode=next;try{localStorage.setItem('noisygeese-language',mode);}catch{}const picker=document.getElementById('languageMode');if(picker)picker.value=mode;refresh();window.dispatchEvent(new CustomEvent('ng-language-change',{detail:{mode}}));}
 window.ngT=translated;
 window.ngLanguage={get mode(){return mode;},setMode,refresh,translate:translated};
 function boot(){const picker=document.getElementById('languageMode');if(picker){picker.value=mode;picker.addEventListener('change',()=>setMode(picker.value));}refresh();}
