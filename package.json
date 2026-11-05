@@ -1,0 +1,1 @@
+{"name":"local-sound-lab","version":"1.0.0","type":"module","private":true,"scripts":{"test":"node test.mjs"}}
