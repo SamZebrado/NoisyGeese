@@ -144,3 +144,12 @@ A strange high-frequency beep would turn up at home during both the day and the 
 
 光靠耳朵来回找实在太累，所以最后请 Dots 帮我做了这个工具：先把声音录下来，看看它在哪个频段，再用同样的条件比较不同位置。至少不用一直凭感觉猜。  
 Trying to track it down by ear was tiring, so I finally asked Dots to help me build this tool: record the sound, see which frequency band it occupies, then compare different locations under the same conditions. At least I would not have to keep guessing by ear.
+
+## 作者实测与录音导出
+## Author field test and audio export
+
+作者进行过一次实际使用测试，在频谱中观察到约 **5413 Hz** 的间歇性“滴滴滴”噪声候选峰。这是一次实测中的频率线索，尚未确定噪声源，也不代表声级校准或所有设备上的性能验证。  
+The author has carried out one real-use test and observed a candidate peak near **5413 Hz** associated with an intermittent beeping noise in the spectrum. This is a frequency clue from a single test, not an identified noise source, sound-level calibration, or performance validation across all devices.
+
+当前网页可导出包含录音的 `.noise` 备份，其中保留原始 Float32 PCM 采样及标签；也可单独下载 WAV 音频。CSV 导出仅包含分析结果，不包含录音。录音不会因为仓库和网页公开而自动上传；分享备份前请检查其中的声音与标签。  
+The current web app can export `.noise` backups containing recordings, preserving the original Float32 PCM samples and labels. Recordings can also be downloaded separately as WAV audio. CSV exports contain analysis results only, not audio. A public repository and website do not automatically upload recordings; review the audio and labels before sharing a backup.

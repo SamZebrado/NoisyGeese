@@ -92,3 +92,9 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 A strange high-frequency beep would turn up at home during both the day and the night. Sometimes chargers plugged into the wall would make a similar sound. At times I was not even sure whether the sound was really there or I was imagining it.
 
 Trying to track it down by ear was tiring, so I finally asked Dots to help me build this tool: record the sound, see which frequency band it occupies, then compare different locations under the same conditions. At least I would not have to keep guessing by ear.
+
+## Author field test and audio export
+
+The author has carried out one real-use test and observed a candidate peak near **5413 Hz** associated with an intermittent beeping noise in the spectrum. This is a frequency clue from a single test, not an identified noise source, sound-level calibration, or performance validation across all devices.
+
+The current web app can export `.noise` backups containing recordings, preserving the original Float32 PCM samples and labels. Recordings can also be downloaded separately as WAV audio. CSV exports contain analysis results only, not audio. A public repository and website do not automatically upload recordings; review the audio and labels before sharing a backup.
