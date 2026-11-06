@@ -12,8 +12,8 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
 
 - 默认使用中文；右上角语言选择器至少高 44 px，可切换中英 / 中文 / English，并在刷新后恢复选择。
   Chinese is the default. The language picker is at least 44 px high, supports bilingual / Chinese / English, and restores the saved choice after reload.
-- 按选定频段适配一次时频图色阶，或手动设置颜色对应的 dBFS 上下限、恢复默认。频率轴保持 20 Hz–20 kHz；更换色阶会清空旧颜色历史。拟合期间改变频段会重新开始，固定后的色阶不会连续追随声音。
-  Fit the spectrogram color range once to the selected band, set manual dBFS color limits, or reset them. Frequency axes remain 20 Hz–20 kHz; changing the color range clears old color history. Changing bands during a fit restarts it, and a locked scale does not continuously follow the sound.
+- 按选定频段适配一次时频图色阶，或手动设置颜色对应的 dBFS 上下限、恢复默认。频率轴保持 20 Hz–20 kHz；更换色阶会按新颜色重绘保留的历史，不清空时频图；调整画布大小也会重绘保留的历史。拟合期间改变频段会重新开始，固定后的色阶不会连续追随声音。
+  Fit the spectrogram color range once to the selected band, set manual dBFS color limits, or reset them. Frequency axes remain 20 Hz–20 kHz; changing the color range redraws the retained history without clearing the spectrogram. Resizing also redraws the retained history. Changing bands during a fit restarts it, and a locked scale does not continuously follow the sound.
 - 捕捉高频窄峰时保留显示像素内最强 FFT 格点。颜色只能增强已录入信号的显示，不能恢复未录入的声音；麦克风、设备处理或信号太弱都可能影响捕捉，可用其他设备或设置对照。
   Display pixels retain the strongest FFT bin so narrow high-frequency peaks remain visible. Color contrast cannot recover uncaptured signals: microphone response, device processing, or a weak signal can affect capture. Compare another device or recording setting.
 - 默认标签使用每次开始录制的本地时间戳；手动输入的标签会保留。采集和对照区域的频率上下限双向同步。色阶不改变原始 PCM、分析算法、共同阈值或比较结果。
@@ -25,8 +25,8 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
   Expand “How to use” for illustrated instructions, including an explicitly fictional fifth-floor example and actual UI screenshots.
 - 内置模拟采集无需麦克风，将合成音频送入实际 AudioWorklet 与 IndexedDB 流程，并标注为模拟数据。  
   Built-in simulated capture requires no microphone. It sends synthetic audio through the real AudioWorklet and IndexedDB pipeline and labels it as simulated data.
-- 开启麦克风时实时查看瞬时频谱和时频图。时频图横轴是时间，纵轴是对数频率，高频在上。  
-  View a live instantaneous spectrum and spectrogram while the microphone is on. The spectrogram shows time horizontally and logarithmic frequency vertically, with high frequencies at the top.
+- 开启麦克风时实时查看瞬时频谱和时频图。时频图横轴是时间，纵轴是对数频率，高频在上；以约 12 秒的有限窗口持续滚动，旧画面逐步移出，不周期性清空。未录制时只保留短时显示数据，不保存原始音频；后台或缺失采样的时间留空。  
+  View a live instantaneous spectrum and spectrogram while the microphone is on. The spectrogram shows time horizontally and logarithmic frequency vertically, with high frequencies at the top. An approximately 12-second bounded window scrolls continuously, moving older content out without periodic resets. When not recording, only short-lived display data is retained, not raw audio. Missing or background sampling intervals stay blank.
 - 在 20 Hz–20 kHz 显示范围内拖动频段上下边界，也可输入数值或用方向键微调，Shift + 方向键调整 10 Hz。  
   Drag the upper and lower band limits within a 20 Hz–20 kHz display range, enter values, or fine-tune with arrow keys. Shift + arrow keys adjusts by 10 Hz.
 - 设置 5、10、20、30、60 或 120 秒录制，按原始 PCM 样本数自动停止，也可提前结束。音频未做归一化。  
@@ -41,6 +41,17 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
   Use one adjustable threshold shared across all recordings to divide short windows into event and quiet groups. Calculate their average power separately and show window counts and estimated durations. Show “None” when no windows qualify.
 - 回听、下载 WAV、导出/导入包含原始 Float32 采样的 `.noise` 备份、导出 CSV。  
   Play recordings, download WAV files, export/import `.noise` backups containing raw Float32 samples, and export CSV.
+
+- “开启麦克风”和“开始录制”位于“如何使用”下方、状态提示与频谱图上方。图内颜色范围上方显示当前分析频段，随拖动边界、键盘或数值输入同步更新。  
+  The microphone and recording buttons sit below “How to use” and above the status and spectrum. The current analysis band appears inside the instrument above the color range and updates with dragging, keyboard adjustments, or numeric input.
+- 每条录音可进行图形回放，默认静音且循环播放；支持暂停/继续、从头播放、拖动进度、可选播放声音和返回实时。回放整条录音，不改变分析起点、原始音频或统计结果。普通循环不重置历史；从头播放或跳转进度会重新开始回放图形。  
+  Each recording supports visual replay, silent and looping by default, with pause/resume, restart, seeking, optional sound, and a return to live mode. Replay uses the full recording without changing analysis start points, original audio, or statistics. Normal loop boundaries preserve the rolling history; restart and seek start a fresh replay graph.
+- 输入指定频率生成正弦纯音试听。默认 5413 Hz、−36 dBFS，带淡入淡出；可手动停止，每次最多 15 秒，离开页面时停止。录制期间不能试听，开始录制会先停止纯音。请先调低设备/耳机音量，不适时立即停止；数字电平不等于实际声压级，麦克风也可能收到测试音。  
+  Enter a frequency to preview a sine tone. Defaults are 5413 Hz and −36 dBFS, with fade-in/fade-out. Stop manually or let it stop after at most 15 seconds; leaving the page stops it. Tone playback is blocked while recording, and starting a recording stops the tone first. Start with low device/headphone volume and stop if uncomfortable. Digital level is not acoustic sound pressure, and the microphone may pick up the tone.
+- 声音记录支持多选删除，删除选择与对照选择分开。确认弹窗列出所选数量和名称；取消不会删除，确认只删除所选记录，保留未选记录。删除不可撤销，请先导出要保留的录音。  
+  Delete multiple recordings using a selection separate from comparison selection. A confirmation dialog lists the selected count and names. Cancel deletes nothing; confirmation deletes only the selected recordings and preserves unselected ones. Deletion cannot be undone, so export anything you want to keep first.
+- 下方对照区域名为“音量分析”，分析频段说明为“分析频段：设置为噪音所在的频段”。  
+  The comparison section is labeled “Volume analysis”; its band instruction is “Analysis band: select the band containing the noise.”
 
 ## 本地运行
 ## Run locally
@@ -126,6 +137,9 @@ npm test
 
 覆盖已知正弦波 RMS、带外抑制、阶跃幅度、零信号、短片段、窄带无格点、削波候选、中文自然排序、事件/安静空集合、分组时长守恒、Worklet 精确停止及提前停止。浏览器中还有“内置计算自检”。  
 Tests cover known sine-wave RMS, out-of-band rejection, amplitude steps, silence, short segments, narrow bands containing no bins, clipping candidates, Chinese natural sorting, empty event/quiet groups, conservation of grouped duration, and exact and early Worklet stopping. The browser also includes a built-in calculation self-check.
+
+新增测试覆盖有限滚动历史与调色保留、回放循环/暂停/跳转、纯音边界/渐变/自动停止、删除选择隔离与存储事务，以及选频拖动同步和控件位置。  
+Additional tests cover bounded rolling history and recoloring, replay looping/pause/seeking, tone limits/ramps/automatic stopping, deletion-selection isolation and storage transactions, and synchronization of band dragging and control placement.
 
 详见 [QA.md](QA.md)。数字算法自检不能校准麦克风。  
 See [QA.md](QA.md) for details. Numerical algorithm self-checks cannot calibrate a microphone.

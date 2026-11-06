@@ -9,14 +9,14 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
 ## Features
 
 - Chinese is the default. The language picker is at least 44 px high, supports bilingual / Chinese / English, and restores the saved choice after reload.
-- Fit the spectrogram color range once to the selected band, set manual dBFS color limits, or reset them. Frequency axes remain 20 Hz–20 kHz; changing the color range clears old color history. Changing bands during a fit restarts it, and a locked scale does not continuously follow the sound.
+- Fit the spectrogram color range once to the selected band, set manual dBFS color limits, or reset them. Frequency axes remain 20 Hz–20 kHz; changing the color range redraws the retained history without clearing the spectrogram. Resizing also redraws the retained history. Changing bands during a fit restarts it, and a locked scale does not continuously follow the sound.
 - Display pixels retain the strongest FFT bin so narrow high-frequency peaks remain visible. Color contrast cannot recover uncaptured signals: microphone response, device processing, or a weak signal can affect capture. Compare another device or recording setting.
 - Default labels use each recording's local start timestamp; manual labels are preserved. Capture and comparison frequency limits synchronize in both directions. Color controls do not change raw PCM, analysis algorithms, the shared threshold, or comparison results.
 
 - The web interface offers three reading modes: bilingual Chinese/English, Chinese, and English.
 - Expand “How to use” for illustrated instructions, including an explicitly fictional fifth-floor example and actual UI screenshots.
 - Built-in simulated capture requires no microphone. It sends synthetic audio through the real AudioWorklet and IndexedDB pipeline and labels it as simulated data.
-- View a live instantaneous spectrum and spectrogram while the microphone is on. The spectrogram shows time horizontally and logarithmic frequency vertically, with high frequencies at the top.
+- View a live instantaneous spectrum and spectrogram while the microphone is on. The spectrogram shows time horizontally and logarithmic frequency vertically, with high frequencies at the top. An approximately 12-second bounded window scrolls continuously, moving older content out without periodic resets. When not recording, only short-lived display data is retained, not raw audio. Missing or background sampling intervals stay blank.
 - Drag the upper and lower band limits within a 20 Hz–20 kHz display range, enter values, or fine-tune with arrow keys. Shift + arrow keys adjusts by 10 Hz.
 - Record for 5, 10, 20, 30, 60, or 120 seconds, with automatic stopping based on the raw PCM sample count, or stop early. Audio is not normalized.
 - Add custom location labels; reorder by dragging, move items up or down, or sort naturally by Chinese floor numbers and Arabic numerals.
@@ -24,6 +24,12 @@ A browser tool for recording, viewing, and comparing sound locally. The website 
 - Choose an analysis start point for each recording and compare average energy using the same frequency band and duration.
 - Use one adjustable threshold shared across all recordings to divide short windows into event and quiet groups. Calculate their average power separately and show window counts and estimated durations. Show “None” when no windows qualify.
 - Play recordings, download WAV files, export/import `.noise` backups containing raw Float32 samples, and export CSV.
+
+- The microphone and recording buttons sit below “How to use” and above the status and spectrum. The current analysis band appears inside the instrument above the color range and updates with dragging, keyboard adjustments, or numeric input.
+- Each recording supports visual replay, silent and looping by default, with pause/resume, restart, seeking, optional sound, and a return to live mode. Replay uses the full recording without changing analysis start points, original audio, or statistics. Normal loop boundaries preserve the rolling history; restart and seek start a fresh replay graph.
+- Enter a frequency to preview a sine tone. Defaults are 5413 Hz and −36 dBFS, with fade-in/fade-out. Stop manually or let it stop after at most 15 seconds; leaving the page stops it. Tone playback is blocked while recording, and starting a recording stops the tone first. Start with low device/headphone volume and stop if uncomfortable. Digital level is not acoustic sound pressure, and the microphone may pick up the tone.
+- Delete multiple recordings using a selection separate from comparison selection. A confirmation dialog lists the selected count and names. Cancel deletes nothing; confirmation deletes only the selected recordings and preserves unselected ones. Deletion cannot be undone, so export anything you want to keep first.
+- The comparison section is labeled “Volume analysis”; its band instruction is “Analysis band: select the band containing the noise.”
 
 ## Run locally
 
@@ -80,6 +86,8 @@ npm test
 ```
 
 Tests cover known sine-wave RMS, out-of-band rejection, amplitude steps, silence, short segments, narrow bands containing no bins, clipping candidates, Chinese natural sorting, empty event/quiet groups, conservation of grouped duration, and exact and early Worklet stopping. The browser also includes a built-in calculation self-check.
+
+Additional tests cover bounded rolling history and recoloring, replay looping/pause/seeking, tone limits/ramps/automatic stopping, deletion-selection isolation and storage transactions, and synchronization of band dragging and control placement.
 
 See [QA.md](QA.md) for details. Numerical algorithm self-checks cannot calibrate a microphone.
 
