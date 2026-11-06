@@ -3,6 +3,7 @@
 (() => {
 'use strict';
 const dictionary = new Map(Object.entries({
+'▥ 图形回放':'▥ Visual replay','♫ 回听':'♫ Listen','回放进度':'Replay position','实时频谱':'Live spectrum',
 '暴噪鹅 · LOCAL SOUND LAB':'暴噪鹅 · LOCAL SOUND LAB',
 '音频只在本机处理':'Audio stays on this device',
 '色阶下限 dBFS':'Color minimum, dBFS',
@@ -135,6 +136,7 @@ dictionary.set("是","Yes");
 dictionary.set("否","No");
 const sourceAliases = new Map([['语言 / Language','语言'],['LIVE SPECTRUM','实时频谱预览'],['CAPTURE','采集'],['YOUR RECORDINGS','你的录音'],['SAME BAND · SAME DURATION','同频段 · 等时长'],['READ BEFORE MEASURING','测量前请阅读']]);
 const rules = [
+[/^图形回放 (.+)$/,m=>`Visual replay ${m[1]}`],
 [/^模拟采集失败：([\s\S]*)$/,m=>`Simulated capture failed: ${english(m[1])}`],
 [/^(\d+) 秒$/,m=>`${m[1]} s`],
 [/^FFT 8192 · ([\d.]+) Hz\/格$/,m=>`FFT 8192 · ${m[1]} Hz/bin`],
@@ -220,3 +222,4 @@ window.ngLanguage={get mode(){return mode;},setMode,refresh,translate:translated
 function boot(){const picker=document.getElementById('languageMode');if(picker){picker.value=mode;picker.addEventListener('change',()=>setMode(picker.value));}refresh();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
+

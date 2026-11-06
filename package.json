@@ -1,1 +1,9 @@
-{"name":"local-sound-lab","version":"1.1.0","type":"module","private":true,"scripts":{"test":"node test.mjs && node test-display.mjs"}}
+{
+  "name": "local-sound-lab",
+  "version": "1.2.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node test.mjs && node test-display.mjs && node test-history.mjs && node test-replay.mjs && node test-tone.mjs && node test-delete.mjs && node test-interactions.mjs"
+  }
+}

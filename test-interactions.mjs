@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const app=readFileSync('dist/app.js','utf8'),html=readFileSync('dist/index.html','utf8');
+const elements=new Map();const $=id=>{if(!elements.has(id))elements.set(id,{style:{},checked:false,events:{},setAttribute(k,v){this[k]=v;},addEventListener(k,v){this.events[k]=v;},setPointerCapture(){},getBoundingClientRect(){return{top:100,height:200};}});return elements.get(id);};
+const state={low:80,high:300};const scope={$ ,state,colorFit:null,invalidate(){},queueColorFit(){},drawSpectrum(){},Math,Number};vm.createContext(scope);
+const a=app.indexOf('function setBand('),b=app.indexOf("for(const [lo,hi]of",a);vm.runInContext(app.slice(a,b),scope);
+const high=$('handleHigh');high.events.pointerdown({pointerId:1});const desired=5413;high.events.pointermove({clientY:100+200*(1-Math.log(desired/20)/Math.log(1000))});assert.equal(state.high,5413);assert.equal($('compareHighHz').value,5413);assert.equal($('currentBand').textContent,'80–5413 Hz');assert.equal($('highHz').value,5413);high.events.pointerup();high.events.pointermove({clientY:100});assert.equal(state.high,5413);
+const low=$('handleLow');low.events.pointerdown({pointerId:2});low.events.pointermove({clientY:100+200*(1-Math.log(5000/20)/Math.log(1000))});assert.equal(state.low,5000);assert.equal($('currentBand').textContent,'5000–5413 Hz');low.events.pointercancel();
+assert(html.indexOf('id="recordButton"')<html.indexOf('id="liveStatus"'));assert(html.indexOf('id="recordButton"')<html.indexOf('id="spectrum"'));assert(html.indexOf('id="currentBand"')<html.indexOf('id="colorLegendLow"'));assert(html.includes('音量分析'));assert(html.includes('分析频段：设置为噪音所在的频段'));
+const deletion=app.slice(app.indexOf("$('deleteSelectedButton').onclick="),app.indexOf('function moveRecord('));assert(deletion.indexOf('if(!confirm(')<deletion.indexOf('await deleteStoredRecordings'));assert(deletion.includes('targets.length'));assert(deletion.includes('未选中的记录会保留'));assert(deletion.includes('state.records.filter(r=>!ids.has(r.id))'));
+console.log('PASS: pointer-drag frequency selection updates plot and analysis fields, pointer release stops changes, controls precede spectrum/status, visible band precedes color legend, requested labels, and confirmation precedes scoped deletion.');

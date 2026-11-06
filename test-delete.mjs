@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {selectedRecordings,deleteStoredRecordings} from './dist/delete-recordings.js';
+const records=[{id:'a',selected:true},{id:'b',selected:false},{id:'c',selected:true},{id:'demo',demo:true}],ids=new Set(['b','demo','missing']);
+const selected=selectedRecordings(records,ids);assert.deepEqual(selected.map(r=>r.id),['b','demo']);assert.deepEqual(records.map(r=>r.selected),[true,false,true,undefined]);
+const removed=[];const db={transaction(name,mode){assert.equal(name,'recordings');assert.equal(mode,'readwrite');const tx={objectStore(){return{delete(id){removed.push(id);queueMicrotask(()=>tx.oncomplete());}};}};return tx;}};
+await deleteStoredRecordings(db,selected);assert.deepEqual(removed,['b'],'Only selected persistent records are passed to the transaction');
+await deleteStoredRecordings(null,[{id:'temporary',unsaved:true},{id:'demo',demo:true}]);await assert.rejects(deleteStoredRecordings(null,[{id:'saved'}]));
+const failing={transaction(){const tx={error:Error('quota/transaction failure'),objectStore(){return{delete(){queueMicrotask(()=>tx.onabort());}};}};return tx;}};
+await assert.rejects(deleteStoredRecordings(failing,[{id:'a'}]));
+console.log('PASS: deletion IDs independent of comparison selection, only selected records removed, demos excluded from IndexedDB, missing storage protected, transaction abort rejected.');
